@@ -34,6 +34,7 @@
         .chat-messages {
             flex-grow: 1;
             overflow-y: auto;
+            max-height: 400px; /* Giữ tin nhắn khi cuộn */
             padding: 15px;
             background: #f8f9fa;
             white-space: pre-wrap;
@@ -113,8 +114,14 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             messageDiv.innerHTML = message.replace(/\n/g, '<br>');
-            chatMessages.insertBefore(messageDiv, typingIndicator);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const shouldScroll = chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - 10;
+            
+            chatMessages.appendChild(messageDiv);
+
+            if (shouldScroll) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
         }
 
         async function sendMessage() {
