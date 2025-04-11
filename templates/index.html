@@ -33,11 +33,14 @@
         }
         .chat-messages {
             flex-grow: 1;
-            overflow-y: auto;
-            max-height: 400px; /* Giữ tin nhắn khi cuộn */
+            overflow-y: auto;  /* Cho phép cuộn */
             padding: 15px;
             background: #f8f9fa;
             white-space: pre-wrap;
+            word-wrap: break-word; /* Xuống dòng khi nội dung dài */
+            display: flex;
+            flex-direction: column;
+            max-height: 400px; /* Giới hạn chiều cao để có thể cuộn */
         }
         .message {
             margin-bottom: 12px;
@@ -114,12 +117,11 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             messageDiv.innerHTML = message.replace(/\n/g, '<br>');
-
-            const shouldScroll = chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - 10;
-            
             chatMessages.appendChild(messageDiv);
 
-            if (shouldScroll) {
+            // Kiểm tra nếu người dùng đang ở cuối danh sách tin nhắn thì cuộn xuống
+            const isScrolledToBottom = chatMessages.scrollHeight - chatMessages.clientHeight <= chatMessages.scrollTop + 50;
+            if (isScrolledToBottom) {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         }
@@ -131,7 +133,6 @@
             addMessage(message, true);
             userInput.value = '';
             typingIndicator.style.display = 'block';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
                 const response = await fetch('/ask', {
